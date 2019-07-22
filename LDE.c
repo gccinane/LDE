@@ -1,8 +1,8 @@
-// Aluno : José Gabriel
+// Autor : José Gabriel Cinane
 
 /*
  Sintese
-   Objetivo: lde
+   Objetivo: lDE
  
    Entrada : 
 
@@ -58,6 +58,10 @@ void consultar(Descritor *lista);
 void excluir(Descritor *lista);
 void gravar(Descritor *lista);
 void recuperar(Descritor *lista);
+void excluirListaUltimo(Descritor **lista);
+void excluirListaUnico(Descritor **lista);
+void excluirListaPrimeiro(Descritor **lista);
+void excluirListaMeio(Descritor **lista, No *excluido);
 
 int main(void)
 {
@@ -114,10 +118,55 @@ int main(void)
   getch();
   return 0;
 }
+/*
+	Objetivo: escluir um nó na primeira posição da lista
+	Parâmetros: lista
+	Retorno:
+*/
+void excluirListaPrimeiro(Descritor **lista){
+	(*lista)->primeiro->ant = NULL;
+	(*lista)->primeiro = (*lista)->primeiro->prox;
+}
+/*
+	Objetivo: excluir um nó de uma lista com apenas um elemento
+	Parâmetros: lista
+	Retorno:
+*/
+void excluirListaUnico(Descritor **lista){
+	(*lista)->primeiro = (*lista)->primeiro->prox;
+}
+/*
+	Objetivo: excluir um nó na última posição da lista
+	Parâmetros: lista
+	Retorno:
+*/
+void excluirListaUltimo(Descritor **lista){
+	(*lista)->ultimo = (*lista)->ultimo->ant;
+	(*lista)->ultimo->prox = NULL;
+}
+/*
+	Objetivo: excluir um nó do meio da lista
+	Parâmetros: lista e o nó a ser excluido
+	Retorno:
+*/
+void excluirListaMeio(Descritor **lista, No *noExclusao){
+	No *aux = (*lista)->primeiro;
+	
+	while(aux != noExclusao){
+		aux = aux->prox;
+	}
 
+	(aux->prox)->ant = aux->ant;
+	(aux->ant)->prox = aux->prox; 
+	
+}
+/*
+	Objetivo: excluir um nó da lista
+	Parâmetros: lista
+	Retorno:
+*/
 void excluir(Descritor *lista){
 	No *noExclusao;
-	No *aux = lista->primeiro->prox;
 	int reg;
 	char opcao;
 	
@@ -135,27 +184,16 @@ void excluir(Descritor *lista){
 				apresentaNo(noExclusao);
 				opcao = leValidaOpcao("\nDeseja realmente excluir este produto?(S/N)", "Tecla invalida", "SN");
 				if(opcao == 'S'){
-					
 					if(lista->qtd == 1){
-						lista->primeiro = lista->primeiro->prox;//unico  ou inicializar a lista
+						excluirListaUnico(&lista);
 					}else{
-						if(lista->primeiro == noExclusao){//primeiro
-							lista->primeiro->ant = NULL;
-							lista->primeiro = lista->primeiro->prox;
-							
+						if(lista->primeiro == noExclusao){
+							excluirListaPrimeiro(&lista);
 						}else{
-							
-							if(lista->ultimo == noExclusao){//ultimo
-								lista->ultimo = lista->ultimo->ant;
-								lista->ultimo->prox = NULL;
+							if(lista->ultimo == noExclusao){
+								excluirListaUltimo(&lista);	
 							}else{
-								
-								while(aux != noExclusao){
-									aux = aux->prox;
-								}
-								// não é necessário utilizar o aux, só substituir o aux das linhas abaixo pelo noexclusao, mas iss eh trampo pra vc jose do futuro ;)))))))
-								(aux->prox)->ant = aux->ant;//meio
-								(aux->ant)->prox = aux->prox; 
+								excluirListaMeio(&lista, noExclusao);				
 							} 
 						}
 					}
@@ -163,18 +201,16 @@ void excluir(Descritor *lista){
 					free(noExclusao);	
 				}
 				
-				
-			
 			}else{
 				printf("Produto não encontrado! ");
 			}
-		}
-
-	
-	
-	
+		}	
 }
-
+/*
+	Objetivo: gravar a lista em um arquivo
+	Parâmetros: lista
+	Retorno:
+*/
 void gravar(Descritor *lista){
 	No *aux = lista->primeiro;
 	FILE *arq;
@@ -192,7 +228,11 @@ void gravar(Descritor *lista){
 	}
 	
 }
-
+/*
+	Objetivo: recuperar a lista de um arquivo
+	Parâmetros: lista
+	Retorno:
+*/
 void recuperar(Descritor *lista){
 
 			FILE *arq;
@@ -221,7 +261,11 @@ void recuperar(Descritor *lista){
 		}
 	
 }
-
+/*
+	Objetivo: consultar um nó da lista
+	Parâmetros: lista
+	Retorno:
+*/
 void consultar(Descritor *lista){
 	int regBusca;
 	No *noBusca;
@@ -233,12 +277,19 @@ void consultar(Descritor *lista){
 		apresentaNo(noBusca);
 		limpaTela();
 }
-
+/*
+	Objetivo: apresentar um nó da lista
+	Parâmetros: um nó
+	Retorno:
+*/
 void apresentaNo(No *aux){
 	printf("Nome: %s\nValor: %f\nRegistro: %d\n\n", aux->dado.nome, aux->dado.valor, aux->dado.reg);
 }
-
-
+/*
+	Objetivo: alterar um nó na lista
+	Parâmetros: lista
+	Retorno:
+*/
 void alterar(Descritor *lista){
 	No *novo;
 	int reg;
@@ -257,12 +308,16 @@ void alterar(Descritor *lista){
 		}
 		
 	}else{
-		printf("Produto não encontrado! ");
+		printf("Produto não encontrado!");
 	}
 	
 		
 }
-
+/*
+	Objetivo: buscar um nó na lista
+	Parâmetros: lista e o registro a ser buscado
+	Retorno:
+*/
 No* buscar(Descritor *lista, int reg){
 	No *aux = (*lista).primeiro;
 
@@ -275,8 +330,11 @@ No* buscar(Descritor *lista, int reg){
 	
 	return NULL;
 }
-
-
+/*
+	Objetivo: listar a lista
+	Parâmetros: lista
+	Retorno:
+*/
 void listar(Descritor *lista){
 	No *aux = (*lista).primeiro;
 	
@@ -292,7 +350,11 @@ void listar(Descritor *lista){
 	
 	limpaTela();
 }
-
+/*
+	Objetivo: destruir a lista
+	Parâmetros: lista
+	Retorno:
+*/
 void destruirLista(Descritor *lista){
 	No *aux = (*lista).primeiro;
 	No *p;
@@ -304,7 +366,11 @@ void destruirLista(Descritor *lista){
 	}
 	inicializarLista(lista);
 }
-
+/*
+	Objetivo: inserir novo nó na lista
+	Parâmetros: lista e o nó a ser inserido
+	Retorno:
+*/
 void insereNo(Descritor *lista, No *novo){
 	if((*lista).qtd == 0){
 		insereListaVazia(&lista, novo);
@@ -334,8 +400,11 @@ void insereNo(Descritor *lista, No *novo){
 	lista->qtd++;
 
 }
-
-
+/*
+	Objetivo: inserir um nó no meio da lista
+	Parâmetros: lista e o nó a ser inserido
+	Retorno:
+*/
 void insereListaMeio(Descritor **lista, No *novo){
 	No *aux = (*lista)->primeiro;
 	while(aux->dado.reg < novo->dado.reg){
@@ -352,14 +421,22 @@ void insereListaMeio(Descritor **lista, No *novo){
 	
  
 }
-
+/*
+	Objetivo: inserir um nó no início da lista
+	Parâmetros: lista e o nó a ser inserido
+	Retorno:
+*/ 
 void insereListaInicio(Descritor **lista, No *novo){
 	novo->prox = (*lista)->primeiro;
 	novo->ant = NULL;
 	(*lista)->primeiro->ant = novo;
 	(*lista)->primeiro = novo;
 }
-
+/*
+	Objetivo: inserir um nó na última posição da lista
+	Parâmetros: lista e o nó a ser inserido
+	Retorno:
+*/
 void insereListaUltimo(Descritor **lista, No *novo){
 	novo->prox = NULL;
 	novo->ant = (*lista)->ultimo;
@@ -368,6 +445,11 @@ void insereListaUltimo(Descritor **lista, No *novo){
 	
 
 }
+/*
+	Objetivo: inserir um nó na lista vazia
+	Parâmetros: lista e o nó a ser inserido
+	Retorno:
+*/
 void insereListaVazia(Descritor **lista, No *novo){
 	(*lista)->primeiro = novo;
 	(*lista)->ultimo = novo;
@@ -375,7 +457,11 @@ void insereListaVazia(Descritor **lista, No *novo){
 	(*lista)->primeiro->ant = NULL;
 	
 }
-
+/*
+	Objetivo: Preenche os dados de um novo nó
+	Parâmetros: um nó
+	Retorno:
+*/
 void entradaProduto(No *novo){
 	printf("-----PRODUTO-----\n\n");
 	printf("Registro: ");
@@ -387,16 +473,28 @@ void entradaProduto(No *novo){
 	gets(novo->dado.nome);
 	limpaTela();
 }
-
+/*
+	Objetivo: alocar nó
+	Parâmetros: 
+	Retorno:
+*/
 No* alocaNo(){
 	return (No*) malloc(sizeof(No));
 }
-
+/*
+	Objetivo: limpar tela
+	Parâmetros:
+	Retorno:
+*/
 void limpaTela(){
 	getch();
 	system("cls");
 }
-
+/*
+	Objetivo: ler e validar um caracter do usuário
+	Parâmetros: string da mensagem a ser exibida, string da mensagem de erro e uma string com as opções válidas
+	Retorno: caracter validado do usuário
+*/
 char leValidaOpcao(char *msn, char *msnErro, char *opcoesValidas)
 {
 	char opcao;
@@ -418,8 +516,11 @@ char leValidaOpcao(char *msn, char *msnErro, char *opcoesValidas)
 	}while(strchr(opcoesValidas,opcao)==NULL);    
 	return opcao;
 }
-
-//inicializar a lista
+/*
+	Objetivo: inicializar a lista
+	Parâmetros: lista
+	Retorno:
+*/
 void inicializarLista(Descritor *lista){
 	(*lista).primeiro = (*lista).ultimo = NULL;
 	(*lista).qtd = 0;
